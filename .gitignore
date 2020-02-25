@@ -1,0 +1,6 @@
+# Project dependencies
+node_modules
+
+# Minified Files
+css/*.min.css
+js/*.min.js
