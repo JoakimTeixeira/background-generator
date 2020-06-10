@@ -5,8 +5,8 @@ Generates gradient background with two colors.
 
 ## What I've learned
 
-* Developed background generator using CSS flexbox and vanilla Javascript.
-* Manipulated DOM elements with Javascript events.
-* Added *tooltip* and *copy to clipboard* functionalities. 
-* Refactored code with latest javascript methods.
-* Implemented DRY principle.
+- Developed background generator using CSS flexbox and vanilla Javascript
+- Manipulated DOM elements with Javascript events
+- Added *tooltip* and *copy to clipboard* functionalities 
+- Refactored code with latest javascript methods
+- Implemented DRY principle
