@@ -16,10 +16,10 @@
   },
   "homepage": "https://github.com/allanalves23/BackgroundGenerator#readme",
   "devDependencies": {
-    "browser-sync": "^2.26.7",
-    "del": "^5.1.0",
+    "browser-sync": "^2.26.13",
+    "del": "^6.0.0",
     "gulp": "^4.0.2",
-    "gulp-clean-css": "^4.2.0",
+    "gulp-clean-css": "^4.3.0",
     "gulp-rename": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "vinyl-paths": "^3.0.1"
