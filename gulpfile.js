@@ -1,25 +1,20 @@
-/**
- * @description Load gulp plugins.
- */
-const gulp = require("gulp");
-const sync = require("browser-sync").create();
+const { src, dest, watch, parallel, series } = require("gulp");
+const { init, reload, stream } = require("browser-sync").create();
 const rename = require("gulp-rename");
-const uglify = require("gulp-uglify");
+const terser = require("gulp-terser");
 const cleanCSS = require("gulp-clean-css");
-const del = require("del");
-const vinylPaths = require("vinyl-paths");
 
 /**
  * @function
- * @description Allows browser sync.
- * @param {Function} done
+ * @description Initializes a local development server and serves files from the base directory.
+ * @param {Function} done - Callback to signal the end of the task.
  */
 function browserSync(done) {
-  sync.init({
+  init({
     server: {
-      baseDir: "./"
+      baseDir: "./",
     },
-    port: 3000
+    port: 3000,
   });
 
   done();
@@ -27,83 +22,60 @@ function browserSync(done) {
 
 /**
  * @function
- * @description Reload current page in browser.
- * @param {Function} done
+ * @description Minifies JS files and outputs the result with a `.min` suffix.
+ */
+function minifyJs() {
+  return src(["./src/js/*.js"])
+    .pipe(terser())
+    .pipe(rename({ suffix: ".min" }))
+    .pipe(dest("./assets/js"))
+    .pipe(stream()); // Stream changes to all browsers
+}
+
+/**
+ * @function
+ * @description Minifies CSS files and outputs the result with a `.min` suffix.
+ */
+function minifyCss() {
+  return src(["./src/css/*.css"])
+    .pipe(cleanCSS()) // Minify CSS files
+    .pipe(rename({ suffix: ".min" }))
+    .pipe(dest("./assets/css", { sourcemaps: true }));
+}
+
+/**
+ * @function
+ * @description Reloads the browser page when file changes are detected.
+ * @param {Function} done - Callback to signal the end of the task.
  */
 function browserSyncReload(done) {
-  sync.reload();
+  reload();
   done();
 }
 
 /**
  * @function
- * @description Minify js files.
- */
-function js() {
-  return gulp
-    .src(["./js/*.js", "!./js/*.min.js"])
-    .pipe(uglify())
-    .pipe(
-      rename({
-        suffix: ".min"
-      })
-    )
-    .pipe(gulp.dest("./js"))
-    .pipe(sync.stream());
-}
-
-/**
- * @function
- * @description Minify css files.
- */
-function css() {
-  return gulp
-    .src("./css/*.css")
-    .pipe(
-      rename({
-        suffix: ".min"
-      })
-    )
-    .pipe(cleanCSS())
-    .pipe(gulp.dest("./css"))
-    .pipe(sync.stream());
-}
-
-/**
- * @function
- * @description Remove minified css files duplicate.
- */
-function removeMinCss() {
-  return gulp.src("./css/*.min.css").pipe(vinylPaths(del));
-}
-
-/**
- * @function
- * @description Watch source files for auto reload function.
+ * @description Monitors specified files for changes, automatically compiling CSS, JS, and reloading the page.
  */
 function watchFiles() {
-  gulp.watch("./src/css/*", browserSyncReload);
-  gulp.watch("./js/*.js", browserSyncReload);
-  gulp.watch("./*.html", browserSyncReload);
+  watch("./src/**/*.css", minifyCss);
+  watch("./assets/**/*.min.css", browserSyncReload);
+  watch("./src/**/*.js", minifyJs);
+  watch("./assets/**/*.min.js", browserSyncReload);
+  watch("./*.html", browserSyncReload);
 }
 
 /**
- * @description Gulp tasks
+ * @description Main tasks: runs gulp tasks in sequence and in parallel.
  */
-const build = gulp.series(removeMinCss, gulp.parallel(js, css));
-const server = gulp.series(
-  build,
-  browserSync,
-  gulp.parallel(browserSyncReload, watchFiles)
-);
+const build = parallel(minifyCss, minifyJs);
+const server = series(build, browserSync, watchFiles); // Run build first, then browserSync and watch files
 
 /**
- * @description Run "gulp" or "gulp build" to generate production files.
+ * @description Exported Tasks:
+ * - `gulp build` - Minifies JS and CSS files.
+ * - `gulp server` - Start the development server and watch files for changes.
  */
 exports.build = build;
 exports.default = build;
-
-/**
- * @description Run "gulp server" to start development server, access in port 3000.
- */
 exports.server = server;
