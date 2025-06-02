@@ -18,7 +18,7 @@
   "homepage": "https://github.com/allanalves23/BackgroundGenerator#readme",
   "devDependencies": {
     "browser-sync": "^3.0.4",
-    "gulp": "^5.0.0",
+    "gulp": "^5.0.1",
     "gulp-clean-css": "^4.3.0",
     "gulp-rename": "^2.0.0",
     "gulp-terser": "^2.1.0"
