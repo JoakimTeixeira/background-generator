@@ -14,7 +14,7 @@ function browserSync(done) {
     server: {
       baseDir: "./",
     },
-    port: 3000,
+    port: 4000,
   });
 
   done();
@@ -27,7 +27,6 @@ function browserSync(done) {
 function minifyJs() {
   return src(["./src/js/*.js"])
     .pipe(terser())
-    .pipe(rename({ suffix: ".min" }))
     .pipe(dest("./assets/js"))
     .pipe(stream()); // Stream changes to all browsers
 }
@@ -39,8 +38,8 @@ function minifyJs() {
 function minifyCss() {
   return src(["./src/css/*.css"])
     .pipe(cleanCSS()) // Minify CSS files
-    .pipe(rename({ suffix: ".min" }))
     .pipe(dest("./assets/css", { sourcemaps: true }));
+    .pipe(rename({ suffix: ".min" }))
 }
 
 /**
@@ -49,7 +48,6 @@ function minifyCss() {
  * @param {Function} done - Callback to signal the end of the task.
  */
 function browserSyncReload(done) {
-  reload();
   done();
 }
 
@@ -58,10 +56,10 @@ function browserSyncReload(done) {
  * @description Monitors specified files for changes, automatically compiling CSS, JS, and reloading the page.
  */
 function watchFiles() {
+  watch("./assets/**/*.min.js", browserSyncReload);
   watch("./src/**/*.css", minifyCss);
   watch("./assets/**/*.min.css", browserSyncReload);
   watch("./src/**/*.js", minifyJs);
-  watch("./assets/**/*.min.js", browserSyncReload);
   watch("./*.html", browserSyncReload);
 }
 
@@ -78,4 +76,4 @@ const server = series(build, browserSync, watchFiles); // Run build first, then 
  */
 exports.build = build;
 exports.default = build;
-exports.server = server;
+// exports.server = server;
